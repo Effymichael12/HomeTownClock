@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const pool = require('./bg')
+const moment = require('moment-timezone')
 const app = express();
 const authenticateJWT = require('./authenticateJWT');
 const bcrypt = require('bcrypt');
@@ -163,17 +164,8 @@ app.post('/clock-in',  async (req, res) => {
     if (exist.rows.length === 0) {
       return res.status(400).json({ message: 'ID does not exist' });
     }
-    const currentDate = new Date().toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit',
-      year: 'numeric',
-    });
-
-    const currentTime = new Date().toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
+    const currentDate = moment().tz('America/New_York').format('MM/DD/YYYY');
+     const currentTime = moment().tz('America/New_York').format('hh:mm A');
 
     const clockOut = '-';
     // Check if there are incomplete clock-outs for the employee
@@ -210,18 +202,8 @@ app.put('/clock-out', async (req, res) => {
       return res.status(400).json({ message: 'ID does not exist' });
     }
 
-    // Format current date as MM/DD/YYYY
-    const currentDate = new Date().toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit',
-      year: 'numeric',
-    });
-
-    const currentTime = new Date().toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
+    const currentDate = moment().tz('America/New_York').format('MM/DD/YYYY');
+    const currentTime = moment().tz('America/New_York').format('hh:mm A');
 
     // Check if the user is clocked in
     const userDidClockIn = await pool.query(
